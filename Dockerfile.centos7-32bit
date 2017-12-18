@@ -1,0 +1,16 @@
+FROM centos:7
+RUN yum -y update && yum -y install gcc libgcc.i686 glibc.i686 glibc-devel.i686 make && \
+    yum clean all
+COPY arena_malloc /arena_malloc
+RUN cd /arena_malloc && \
+    make clean && \
+    make 32-bit && \
+    cp /arena_malloc/arena_malloc /usr/bin/ && \
+    make clean && \
+    cd / && \
+    yum -y erase gcc make glibc-devel.i686 libgcc.i686 && \
+    yum clean all
+RUN yum -y install gdb && \
+    yum clean all
+COPY trace_arena_new.gdb /
+CMD gdb -x trace_arena_new.gdb arena_malloc

@@ -1,0 +1,16 @@
+FROM centos:7
+RUN yum -y install gcc make && \
+    yum clean all
+COPY arena_malloc /arena_malloc
+RUN cd /arena_malloc && \
+    make clean && \
+    make && \
+    cp /arena_malloc/arena_malloc /usr/bin/ && \
+    make clean && \
+    cd / && \
+    yum -y erase gcc make && \
+    yum clean all
+RUN yum -y install gdb && \
+    yum clean all
+COPY trace_arena_new.gdb /
+CMD gdb -x trace_arena_new.gdb arena_malloc
